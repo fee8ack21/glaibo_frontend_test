@@ -1,1 +1,8 @@
-/* You can add global styles to this file, and also import other style files */
+@import "./styles/vendors/bootstrap-reboot";
+@import "./styles/vendors/bootstrap-grid";
+
+@import "./styles/base/typography";
+@import "./styles/base/scrollbar";
+
+@import "./styles/utils/variables";
+@import "./styles/utils/mixins";

@@ -1,0 +1,30 @@
+@mixin media-xl {
+    @media screen and (min-width: 1200px) {
+        @content;
+    }
+}
+
+@mixin media-lg {
+    @media screen and (min-width: 992px) {
+        @content;
+    }
+}
+
+@mixin media-md {
+    @media screen and (min-width: 768px) {
+        @content;
+    }
+}
+
+@mixin media-sm {
+    @media screen and (min-width: 576px) {
+        @content;
+    }
+}
+
+@mixin flex-width($percent) {
+    -ms-flex: 0 0 $percent;
+    flex: 0 0 $percent;
+    width: $percent;
+    max-width: $percent;
+}
