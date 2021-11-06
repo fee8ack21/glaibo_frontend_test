@@ -1,1 +1,26 @@
-<p>product-list works!</p>
+<div class="container pt-5">
+    <app-tab-navbar [pathPrefix]="'/product'" [childrenPathObjList]="childrenPathObjList"></app-tab-navbar>
+    <div class="products">
+        <ul class="products__list">
+            <li class="products__item products__item--first-row">
+                <span class="products__cell products__cell--first-row">商品編號</span>
+                <span class="products__cell products__cell--first-row">商品名稱</span>
+                <span class="products__cell products__cell--first-row">商品價格</span>
+                <span class="products__cell products__cell--first-row">圖片</span>
+            </li>
+            <li class="products__item" *ngFor="let product of productList">
+                <span class="products__cell">{{product.id}}</span>
+                <span class="products__cell">
+                    <a class="products__link" href=""
+                        [routerLink]="['/product', product.type, product.id]">{{product.name}}</a>
+                </span>
+                <span class="products__cell">NT${{product.price}}</span>
+                <span class="products__cell">
+                    <a class="products__link" href="" [routerLink]="['/product', product.type, product.id]">
+                        <img class="products__image" src="/assets/images/test/product.jpg" alt="">
+                    </a>
+                </span>
+            </li>
+        </ul>
+    </div>
+</div>

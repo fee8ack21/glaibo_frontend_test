@@ -1,7 +1,0 @@
-<div class="tab-navbar-modal js-close" [ngClass]="{'tab-navbar-modal--open': isModalOpen}" (click)="onModalClose($event)">
-    <div class="tab-navbar-modal__content" [ngClass]="{'tab-navbar-modal__content--open': isModalOpen}">
-        <div class="tab-navbar-modal__body">
-            <a class="js-close tab-navbar-modal__link" *ngFor="let pathObj of pathObjList" [routerLink]="[pathPrefix, pathObj.path]" routerLinkActive="tab-navbar-modal__link--active">{{pathObj.name}}</a>
-        </div>
-    </div>
-</div>
