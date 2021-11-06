@@ -1,0 +1,21 @@
+<nav #tabNavbar *ngIf="!isMobile" class="tab-navbar row">
+    <div class="tab-navbar__wrap">
+        <ul class="tab-navbar__list">
+            <li class="tab-navbar__item" *ngFor="let pathObj of pathObjList;let isFirst = first; let isLast = last">
+                <a class="tab-navbar__link"
+                    [ngClass]="{'tab-navbar__link--first': isFirst,'tab-navbar__link--last':isLast}"
+                    [routerLink]="[pathPrefix, pathObj.path]" [routerLinkActiveOptions]="{exact: false}"
+                    routerLinkActive="tab-navbar__link--active">{{pathObj.name}}</a>
+            </li>
+        </ul>
+    </div>
+</nav>
+<div *ngIf="isMobile" class="tab-navbar-mobile">
+    <div>
+        <a class="tab-navbar-mobile__link" href="#/" (click)="openTabNavbarModal($event)">
+            {{breadcrumbName}}
+        </a>
+    </div>
+    <app-tab-navbar-modal [pathPrefix]="pathPrefix" [pathObjList]="pathObjList" [isModalOpen]="isModalOpen"
+        (modalClose)="isModalOpen=$event"></app-tab-navbar-modal>
+</div>
