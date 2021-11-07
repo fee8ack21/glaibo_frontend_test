@@ -57,9 +57,34 @@
 }
 
 .product-image {
-    &__image {
-        width: 100%;
-        object-fit: cover;
-        object-position: center;
+    width: 100%;
+    height: 500px;
+    position: relative;
+    background-image: var(--bg-image);
+    background-size: 100% 500px;
+    background-repeat: no-repeat;
+    &:hover {
+        cursor: crosshair;
+    }
+
+    &__magnifier {
+        position: absolute;
+        width: 120px;
+        height: 120px;
+        border-radius: 50%;
+        border: 1px solid rgba(0, 0, 0, 0.8);
+        box-shadow: rgba(0, 0, 0, 0.4) 0 0 3px 3px;
+        background-repeat: no-repeat;
+        background-image: var(--bg-image);
+        opacity: 0;
+        visibility: hidden;
+        transition: 0.2s opacity;
+
+        &--show {
+            background-size: 900px 900px;
+            background-position: calc(var(--distance-x) * 100%) calc(var(--distance-y) * 100%);
+            opacity: 1;
+            visibility: visible;
+        }
     }
 }
