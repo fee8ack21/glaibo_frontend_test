@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, ElementRef, HostListener, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Product, ProductType } from 'src/app/shared/models/product';
 import { TabNavbar } from 'src/app/shared/models/tab-navbar';
@@ -13,8 +13,14 @@ import { LoaderService } from 'src/app/shared/services/loader.service';
 
 export class ProductListComponent implements OnInit {
   childrenPathObjList: TabNavbar[] = [];
+
+  _productList: Product[] = [];
   productList: Product[] = [];
-  dataList: Product[] = [];
+
+  loadCounter = 1;
+  loadAmount = 20;
+  loadMaxCounter: number;
+  @ViewChild('productsList') public productsListEle: ElementRef;
 
   constructor(
     private route: ActivatedRoute,
@@ -44,6 +50,10 @@ export class ProductListComponent implements OnInit {
     }
 
     this.route.params.subscribe(params => {
+      // reset
+      this.productList = [];
+      this.loadCounter = 1;
+
       this.loaderService.start();
 
       this.getProducts(params.productType).then(() => {
@@ -51,8 +61,17 @@ export class ProductListComponent implements OnInit {
       }).catch(error => {
         alert(error);
         this.loaderService.stop();
+      }).then(() => {
+        this.showProducts();
       });
     })
+  }
+
+  @HostListener('window:scroll', ['$event'])
+  onResize($event?: any) {
+    if (window.scrollY > this.loadCounter * 800) {
+      this.showProducts();
+    }
   }
 
   getProductTypes() {
@@ -78,7 +97,8 @@ export class ProductListComponent implements OnInit {
     return new Promise((resolve, reject) => {
       this.httpService.get<Product[]>(`products?type=${type}`).subscribe(
         response => {
-          this.productList = response;
+          this._productList = response;
+          this.loadMaxCounter = Math.ceil(response.length / this.loadAmount);
           resolve('');
         },
         error => {
@@ -86,5 +106,12 @@ export class ProductListComponent implements OnInit {
         }
       );
     })
+  }
+
+  showProducts() {
+    if (this.loadCounter > this.loadMaxCounter) { return };
+
+    this.productList = this.productList.concat(this._productList.slice((this.loadCounter - 1) * this.loadAmount, (this.loadCounter * this.loadAmount)))
+    this.loadCounter++;
   }
 }

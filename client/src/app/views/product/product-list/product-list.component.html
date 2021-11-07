@@ -1,7 +1,7 @@
 <div class="container pt-5">
     <app-tab-navbar [pathPrefix]="'/product'" [childrenPathObjList]="childrenPathObjList"></app-tab-navbar>
     <div class="products">
-        <ul class="products__list">
+        <ul #productsList class="products__list">
             <li class="products__item products__item--first-row">
                 <span class="products__cell products__cell--first-row">商品編號</span>
                 <span class="products__cell products__cell--first-row">商品名稱</span>
