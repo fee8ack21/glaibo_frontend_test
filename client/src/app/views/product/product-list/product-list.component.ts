@@ -55,17 +55,6 @@ export class ProductListComponent implements OnInit {
     })
   }
 
-  createData() {
-    for (let i = 0; i < 1000; i++) {
-      let type = i % 4; // 0, 1, 2
-
-      let data = { id: i + 1, name: '商品' + i, type: type + 1, price: 100 + i, image: "" }
-      this.dataList.push(data)
-    }
-
-    console.log(this.dataList);
-  }
-
   getProductTypes() {
     return new Promise((resolve, reject) => {
       this.httpService.get<ProductType[]>('productTypes').subscribe(

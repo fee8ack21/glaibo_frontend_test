@@ -17,7 +17,7 @@
                 <span class="products__cell">NT${{product.price}}</span>
                 <span class="products__cell">
                     <a class="products__link" href="" [routerLink]="['/product', product.type, product.id]">
-                        <img class="products__image" src="/assets/images/test/product.jpg" alt="">
+                        <img class="products__image" [src]="product.image" alt="">
                     </a>
                 </span>
             </li>
