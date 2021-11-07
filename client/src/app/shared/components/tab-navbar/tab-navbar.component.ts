@@ -1,4 +1,4 @@
-import { Component, OnInit, AfterViewInit, Input, HostListener, OnChanges, ViewChild, ElementRef } from '@angular/core';
+import { Component, OnInit, Input, HostListener, OnChanges } from '@angular/core';
 import { Router } from '@angular/router';
 
 @Component({
@@ -6,7 +6,7 @@ import { Router } from '@angular/router';
   templateUrl: './tab-navbar.component.html',
   styleUrls: ['./tab-navbar.component.scss']
 })
-export class TabNavbarComponent implements OnChanges, OnInit, AfterViewInit {
+export class TabNavbarComponent implements OnChanges, OnInit {
   isMobile = false;
   isModalOpen = false;
   breadcrumbName: string;
@@ -16,11 +16,6 @@ export class TabNavbarComponent implements OnChanges, OnInit, AfterViewInit {
 
   @Input('childrenPathObjList')
   public pathObjList: any;
-
-  // for position sticky
-  @ViewChild('tabNavbar') public tabNavbar: ElementRef;
-  tabNavbarTop: number;
-
 
   constructor(
     private router: Router,
@@ -38,26 +33,12 @@ export class TabNavbarComponent implements OnChanges, OnInit, AfterViewInit {
     })
   }
 
-  ngAfterViewInit() {
-    this.tabNavbarTop = this.tabNavbar.nativeElement.getBoundingClientRect().top;
-  }
-
   @HostListener('window:resize', ['$event'])
   onResize($event?: any) {
     if (window.innerWidth < 992) {
       this.isMobile = true;
     } else {
       this.isMobile = false;
-    }
-  }
-
-
-  @HostListener('window:scroll', ['$event'])
-  onScroll($event?: any) {
-    if (window.pageYOffset > this.tabNavbarTop) {
-      this.tabNavbar.nativeElement.classList.add('tab-navbar--fixed');
-    } else {
-      this.tabNavbar.nativeElement.classList.remove('tab-navbar--fixed');
     }
   }
 
