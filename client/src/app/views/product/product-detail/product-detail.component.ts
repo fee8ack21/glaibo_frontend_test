@@ -33,7 +33,7 @@ export class ProductDetailComponent implements OnInit {
       this.loaderService.stop();
     });
 
-    this.magnifier();
+    this.setMagnifier();
   }
 
   getProduct(id: number) {
@@ -50,7 +50,7 @@ export class ProductDetailComponent implements OnInit {
     })
   }
 
-  magnifier() {
+  setMagnifier() {
     var productImage = this.elements.nativeElement.querySelector('.product-image');
     var magnifier = this.elements.nativeElement.querySelector('.product-image__magnifier');
 

@@ -11,8 +11,8 @@
         </div>
         <div class="row">
             <div class="col-12 col-lg-6 mb-3 mb-lg-0">
-                <div class="product-image" style="--bg-image:url('/assets/images/test/product.jpg')">
-                    <div class="product-image__magnifier" style="--bg-image:url('/assets/images/test/product.jpg')">
+                <div class="product-image" [style.background-image]="'url(' + product.image + ')'">
+                    <div class="product-image__magnifier" [style.background-image]="'url(' + product.image + ')'">
                     </div>
                 </div>
             </div>
