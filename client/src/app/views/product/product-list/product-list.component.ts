@@ -1,5 +1,6 @@
 import { Component, ElementRef, HostListener, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
+import { Subject } from 'rxjs';
 import { Product, ProductType } from 'src/app/shared/models/product';
 import { TabNavbar } from 'src/app/shared/models/tab-navbar';
 import { HttpService } from 'src/app/shared/services/http.service';
@@ -20,6 +21,8 @@ export class ProductListComponent implements OnInit {
   loadCounter = 1;
   loadAmount = 20;
   loadMaxCounter: number;
+
+  isFirstRouteChange = true;
   @ViewChild('productsList') public productsListEle: ElementRef;
 
   constructor(
@@ -30,40 +33,23 @@ export class ProductListComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
-    if (this.route.snapshot.params['productType'] != undefined) {
-      this.loaderService.start();
-
-      this.getProductTypes().then(productType => {
-        this.getProducts(this.route.snapshot.params['productType'])
-        this.loaderService.stop();
-      }).catch(error => {
-        alert(error);
-        this.loaderService.stop();
-      })
-    } else {
-      this.getProductTypes().then(productType => {
-        this.router.navigate(['/product', productType])
-      }).catch(error => {
-        alert(error);
-        this.loaderService.stop();
-      })
-    }
+    this.getPageInfo();
 
     this.route.params.subscribe(params => {
+      if (this.isFirstRouteChange) { this.isFirstRouteChange = false; return; }
+
       // reset
       this.productList = [];
       this.loadCounter = 1;
 
       this.loaderService.start();
-
-      this.getProducts(params.productType).then(() => {
-        this.loaderService.stop();
-      }).catch(error => {
-        alert(error);
-        this.loaderService.stop();
-      }).then(() => {
+      
+      this.getProducts(params.productType).subscribe(subject => {
         this.showProducts();
-      });
+        this.loaderService.stop();
+      }, error => {
+        alert(error);
+      })
     })
   }
 
@@ -74,38 +60,63 @@ export class ProductListComponent implements OnInit {
     }
   }
 
-  getProductTypes() {
-    return new Promise((resolve, reject) => {
-      this.httpService.get<ProductType[]>('productTypes').subscribe(
-        response => {
-          let _childrenPathObjList: TabNavbar[] = [];
+  getPageInfo() {
+    const param = this.route.snapshot.params['productType'];
+    this.loaderService.start();
 
-          response.forEach((item: any) => {
-            _childrenPathObjList.push({ path: item.id.toString(), name: item.name })
-          })
-          this.childrenPathObjList = _childrenPathObjList;
-
-          resolve(this.childrenPathObjList[0].path);
-        },
-        error => {
-          reject('商品分類載入錯誤');
+    this.getProductTypes().subscribe(subject => {
+      if (param != undefined) {
+        this.getProducts(param).subscribe(subject => {
+          this.showProducts();
+          this.loaderService.stop();
+        }, error => {
+          alert(error)
         });
+      } else {
+        this.getProducts(parseInt(this.childrenPathObjList[0].path)).subscribe(subject => {
+          this.showProducts();
+          this.loaderService.stop();
+        }, error => {
+          alert(error);
+        });
+      }
+    }, error => {
+      alert(error)
     })
   }
 
+  getProductTypes() {
+    let subject = new Subject<boolean>();
+    this.httpService.get<ProductType[]>('productTypes').subscribe(
+      response => {
+        let _childrenPathObjList: TabNavbar[] = [];
+
+        response.forEach((item: any) => {
+          _childrenPathObjList.push({ path: item.id.toString(), name: item.name })
+        })
+        this.childrenPathObjList = _childrenPathObjList;
+        subject.next(true)
+      },
+      error => {
+        subject.error('商品分類載入錯誤')
+      });
+    return subject;
+  }
+
   getProducts(type: number) {
-    return new Promise((resolve, reject) => {
-      this.httpService.get<Product[]>(`products?type=${type}`).subscribe(
-        response => {
-          this._productList = response;
-          this.loadMaxCounter = Math.ceil(response.length / this.loadAmount);
-          resolve('');
-        },
-        error => {
-          reject('商品列表載入錯誤');
-        }
-      );
-    })
+    let subject = new Subject<boolean>();
+    this.httpService.get<Product[]>(`products?type=${type}`).subscribe(
+      response => {
+        this._productList = response;
+        this.loadMaxCounter = Math.ceil(response.length / this.loadAmount);
+        subject.next(true)
+      },
+      error => {
+        subject.error('商品列表載入錯誤')
+      }
+    );
+
+    return subject;
   }
 
   showProducts() {
