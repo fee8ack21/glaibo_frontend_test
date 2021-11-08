@@ -1,4 +1,4 @@
-import { Component, ElementRef, OnInit } from '@angular/core';
+import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Product } from 'src/app/shared/models/product';
 import { HttpService } from 'src/app/shared/services/http.service';
@@ -12,6 +12,9 @@ import { LoaderService } from 'src/app/shared/services/loader.service';
 export class ProductDetailComponent implements OnInit {
   product: Product = { id: '', name: '', price: 0, type: 0, typeName: '', image1: '', image2: '' };
   productType: number;
+  isImgLoaded: false;
+  @ViewChild('productImage') productImage: ElementRef;
+  @ViewChild('productMagnifier') productMagnifier: ElementRef;
 
   constructor(
     private route: ActivatedRoute,
@@ -25,29 +28,50 @@ export class ProductDetailComponent implements OnInit {
     let productID = this.route.snapshot.params['productID'];
     this.productType = this.route.snapshot.params['productType'];
 
-    this.loaderService.start();
-    this.getProduct(productID).then(() => {
-      this.loaderService.stop();
-    }).catch(error => {
-      alert(error);
-      this.loaderService.stop();
-    });
-
+    this.getProduct(productID);
     this.setMagnifier();
   }
 
   getProduct(id: number) {
+    this.loaderService.start();
+
+    this.httpService.get<Product>(`products/${id}`).subscribe(
+      response => {
+        this.product = response;
+
+        this.setProductImage().then(() => {
+          this.loaderService.stop();
+        }).catch(error => {
+          alert(error);
+          this.loaderService.stop();
+        })
+      },
+      error => {
+        alert('商品資料載入錯誤')
+        this.loaderService.stop();
+      }
+    );
+  }
+
+  setProductImage() {
     return new Promise((resolve, reject) => {
-      this.httpService.get<Product>(`products/${id}`).subscribe(
-        response => {
-          this.product = response;
-          resolve('');
-        },
-        error => {
-          reject('商品資料載入錯誤');
-        }
-      );
+      const _this = this;
+      const imageURL = this.product.image2;
+      let image = new Image();
+
+      image.onload = () => {
+        _this.productImage.nativeElement.style.backgroundImage = `url(${imageURL})`;
+        _this.productMagnifier.nativeElement.style.backgroundImage = `url(${imageURL})`;
+        resolve('')
+      }
+
+      image.onerror = () => {
+        reject('商品圖片載入錯誤')
+      }
+
+      image.src = imageURL;
     })
+
   }
 
   setMagnifier() {
