@@ -10,7 +10,7 @@ import { LoaderService } from 'src/app/shared/services/loader.service';
   styleUrls: ['./product-detail.component.scss']
 })
 export class ProductDetailComponent implements OnInit {
-  product: Product = { id: '', name: '', price: 0, type: 0, typeName: '', image: '' };
+  product: Product = { id: '', name: '', price: 0, type: 0, typeName: '', image1: '', image2: '' };
   productType: number;
 
   constructor(
