@@ -58,6 +58,16 @@
         &:hover {
             text-decoration: underline;
         }
+
+        &--image {
+            display: inline-block;
+            width: 60px;
+            height: 60px;
+            background-image: url("/assets/images/default/loading_60.png");
+            background-position: center;
+            background-repeat: no-repeat;
+            background-size: cover;
+        }
     }
 
     &__image {
