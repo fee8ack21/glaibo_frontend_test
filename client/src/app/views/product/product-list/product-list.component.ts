@@ -19,7 +19,7 @@ export class ProductListComponent implements OnInit {
   productList: Product[] = [];
 
   loadCounter = 1;
-  loadAmount = 20;
+  loadAmount = 30;
   loadMaxCounter: number;
 
   isFirstRouteChange = true;
@@ -29,7 +29,8 @@ export class ProductListComponent implements OnInit {
     private route: ActivatedRoute,
     private router: Router,
     private httpService: HttpService,
-    private loaderService: LoaderService
+    private loaderService: LoaderService,
+    private elements: ElementRef
   ) { }
 
   ngOnInit(): void {
@@ -39,12 +40,13 @@ export class ProductListComponent implements OnInit {
       if (this.isFirstRouteChange) { this.isFirstRouteChange = false; return; }
 
       // reset
+      this._productList = [];
       this.productList = [];
       this.loadCounter = 1;
 
       this.loaderService.start();
-      
-      this.getProducts(params.productType).subscribe(subject => {
+
+      this.getProducts(params.productType).subscribe(result => {
         this.showProducts();
         this.loaderService.stop();
       }, error => {
@@ -54,8 +56,16 @@ export class ProductListComponent implements OnInit {
   }
 
   @HostListener('window:scroll', ['$event'])
-  onResize($event?: any) {
-    if (window.scrollY > this.loadCounter * 800) {
+  lazyLoadProducts($event?: any) {
+    if (this.loadCounter == 1) { return } // 避免params change時觸發
+
+    let windowHeight = window.screen.height;
+    let windowScrollY = window.scrollY;
+    let listOffsetTop = this.elements.nativeElement.querySelector('.products__list').offsetTop;
+    let listHeight = this.elements.nativeElement.querySelector('.products__list').offsetHeight;
+
+    // 在有資料的情況時，至少預留一個window height的scroll 空間
+    if ((listOffsetTop + listHeight) - (windowScrollY + windowHeight) <= windowHeight) {
       this.showProducts();
     }
   }
@@ -64,16 +74,16 @@ export class ProductListComponent implements OnInit {
     const param = this.route.snapshot.params['productType'];
     this.loaderService.start();
 
-    this.getProductTypes().subscribe(subject => {
+    this.getProductTypes().subscribe(result => {
       if (param != undefined) {
-        this.getProducts(param).subscribe(subject => {
+        this.getProducts(param).subscribe(result => {
           this.showProducts();
           this.loaderService.stop();
         }, error => {
           alert(error)
         });
       } else {
-        this.getProducts(parseInt(this.childrenPathObjList[0].path)).subscribe(subject => {
+        this.getProducts(parseInt(this.childrenPathObjList[0].path)).subscribe(result => {
           this.showProducts();
           this.loaderService.stop();
         }, error => {
@@ -86,7 +96,7 @@ export class ProductListComponent implements OnInit {
   }
 
   getProductTypes() {
-    let subject = new Subject<boolean>();
+    let result = new Subject<boolean>();
     this.httpService.get<ProductType[]>('productTypes').subscribe(
       response => {
         let _childrenPathObjList: TabNavbar[] = [];
@@ -95,28 +105,28 @@ export class ProductListComponent implements OnInit {
           _childrenPathObjList.push({ path: item.id.toString(), name: item.name })
         })
         this.childrenPathObjList = _childrenPathObjList;
-        subject.next(true)
+        result.next(true)
       },
       error => {
-        subject.error('商品分類載入錯誤')
+        result.error('商品分類載入錯誤')
       });
-    return subject;
+    return result;
   }
 
   getProducts(type: number) {
-    let subject = new Subject<boolean>();
+    let result = new Subject<boolean>();
     this.httpService.get<Product[]>(`products?type=${type}`).subscribe(
       response => {
         this._productList = response;
         this.loadMaxCounter = Math.ceil(response.length / this.loadAmount);
-        subject.next(true)
+        result.next(true)
       },
       error => {
-        subject.error('商品列表載入錯誤')
+        result.error('商品列表載入錯誤')
       }
     );
 
-    return subject;
+    return result;
   }
 
   showProducts() {

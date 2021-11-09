@@ -103,7 +103,6 @@ export class ProductDetailComponent implements OnInit {
 
       let magnifierWidth = magnifier.offsetWidth;
       let magnifierHeight = magnifier.offsetHeight;
-
       magnifier.style.setProperty('--distance-x', distanceX)
       magnifier.style.setProperty('--distance-y', distanceY)
       magnifier.style["top"] = `calc(${distanceY * 100}% - ${magnifierWidth / 2}px)`;
