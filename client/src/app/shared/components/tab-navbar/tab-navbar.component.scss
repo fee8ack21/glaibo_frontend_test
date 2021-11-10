@@ -2,37 +2,37 @@
 @import "../../../../styles/utils/mixins";
 
 .tab-navbar {
+    position: sticky;
+    top: 0px;
     display: flex;
     justify-content: center;
     margin-bottom: 3rem;
-    position: sticky;
-    top: 0px;
 
     &__wrap {
-        width: 100%;
         position: relative;
+        width: 100%;
         padding-right: 15px;
         padding-left: 15px;
         margin: auto;
     }
 
     &__list {
-        width: 100%;
-        min-width: 100px;
-        height: 66px;
         display: flex;
         flex-direction: row;
         justify-content: center;
         align-items: center;
+        width: 100%;
+        min-width: 100px;
+        height: 66px;
+        list-style: none;
         padding-left: 40px;
         padding-right: 40px;
-        overflow: hidden;
+        margin-bottom: 0;
         white-space: nowrap;
         border: 1px solid $color-secondary;
-        list-style: none;
         background-color: $color-white;
         box-shadow: rgba(98, 86, 90, 0.16) 0 3px 0px;
-        margin-bottom: 0;
+        overflow: hidden;
     }
 
     &__item {
@@ -41,11 +41,11 @@
     &__link {
         position: relative;
         display: inline-block;
-        color: $color-black;
-        font-weight: $weight-bold;
         padding: 20px 15px;
         margin-left: 25.5px;
         margin-right: 25.5px;
+        color: $color-black;
+        font-weight: $weight-bold;
         text-decoration: none;
         transition: $speed-normal;
         &--first {
@@ -57,11 +57,11 @@
 
         &::before {
             content: "";
-            height: 6px;
-            width: 100%;
             position: absolute;
-            bottom: 0px;
             left: 0px;
+            bottom: 0px;
+            width: 100%;
+            height: 6px;
             border-radius: 6px;
             background-color: transparent;
             transition: $speed-normal;
@@ -78,10 +78,10 @@
 }
 
 .tab-navbar-mobile {
-    display: flex;
-    justify-content: center;
     position: sticky;
     top: 0px;
+    display: flex;
+    justify-content: center;
     margin-bottom: 3rem;
 
     @include media-xl {
@@ -89,25 +89,25 @@
     }
 
     > div {
+        position: relative;
         width: 100%;
         height: 66px;
-        position: relative;
+        list-style: none;
+        margin-bottom: 0;
         white-space: nowrap;
         border: 1px solid $color-secondary;
-        list-style: none;
         background-color: $color-white;
         box-shadow: rgba(98, 86, 90, 0.16) 0 3px 0px;
-        margin-bottom: 0;
     }
 
     &__link {
-        width: 100%;
         display: inline-block;
+        width: 100%;
         padding: 20px 40px;
+        margin-bottom: 0;
+        color: $color-primary;
         font-size: 16px;
         font-weight: $weight-bold;
-        color: $color-primary;
-        margin-bottom: 0;
         text-decoration: none;
 
         &:hover {
@@ -115,16 +115,16 @@
         }
         &::before {
             content: "";
-            width: 15px;
-            height: 15px;
             position: absolute;
             top: 50%;
-            transform: translateY(-50%);
             right: 40px;
+            width: 15px;
+            height: 15px;
             background-image: url("/assets/images/icons/arrow_bottom_pink.svg");
             background-repeat: no-repeat;
             background-size: contain;
             background-position: center;
+            transform: translateY(-50%);
         }
     }
 }
