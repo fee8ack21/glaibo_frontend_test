@@ -53,8 +53,7 @@ export class ProductListComponent implements OnInit, OnDestroy {
         this.showProducts();
 
         // 路由變化後，重新綁定request interval
-        clearInterval(this.getProductsInterval);
-        this.setGetProductsInterval();
+        this.resetGetProductsInterval();
 
         this.loaderService.stop();
       }, error => {
@@ -92,8 +91,7 @@ export class ProductListComponent implements OnInit, OnDestroy {
           this.showProducts();
 
           // 執行第一次getProducts後，綁定request interval
-          clearInterval(this.getProductsInterval);
-          this.setGetProductsInterval();
+          this.resetGetProductsInterval();
 
           this.loaderService.stop();
         }, error => {
@@ -194,7 +192,7 @@ export class ProductListComponent implements OnInit, OnDestroy {
 
             priceColumns[this.oldIndexChangedList[i]].style['color'] = 'black';
           }
-          
+
           // 針對這一輪資料變動的欄位更改樣式
           for (let i = 0; i < this.newIndexChangedList.length; i++) {
             if (this.newIndexChangedList[i] > priceColumns.length) { continue };
@@ -209,6 +207,11 @@ export class ProductListComponent implements OnInit, OnDestroy {
       );
       return result;
     }, 5000)
+  }
+
+  resetGetProductsInterval() {
+    clearInterval(this.getProductsInterval);
+    this.setGetProductsInterval();
   }
 
   getRandomInt(min: number, max: number) {
