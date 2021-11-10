@@ -10,7 +10,7 @@
         </ul>
     </div>
 </nav>
-<div *ngIf="isMobile" class="tab-navbar-mobile">
+<nav *ngIf="isMobile" class="tab-navbar-mobile">
     <div>
         <a class="tab-navbar-mobile__link" href="#/" (click)="openTabNavbarModal($event)">
             {{breadcrumbName}}
@@ -18,4 +18,4 @@
     </div>
     <app-tab-navbar-modal [pathPrefix]="pathPrefix" [pathObjList]="pathObjList" [isModalOpen]="isModalOpen"
         (modalClose)="isModalOpen=$event"></app-tab-navbar-modal>
-</div>
+</nav>

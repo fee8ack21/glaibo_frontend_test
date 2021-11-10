@@ -27,6 +27,7 @@ export class ProductListComponent implements OnInit, OnDestroy {
   newIndexChangedList: number[] = [];
 
   isFirstRouteChange = true;
+  hasContent: boolean = true;
   @ViewChild('productsList') public productsListEle: ElementRef;
 
   constructor(
@@ -96,12 +97,14 @@ export class ProductListComponent implements OnInit, OnDestroy {
           this.loaderService.stop();
         }, error => {
           alert(error)
+          this.loaderService.stop();
         });
       } else {
         this.router.navigate(['/product', this.pathObjList[0].path]);
       }
     }, error => {
       alert(error)
+      this.loaderService.stop();
     })
   }
 
@@ -127,6 +130,12 @@ export class ProductListComponent implements OnInit, OnDestroy {
     let result = new Subject<boolean>();
     this.httpService.get<Product[]>(`products?type=${type}`).subscribe(
       response => {
+        if (response
+          && Object.keys(response).length === 0
+          && Object.getPrototypeOf(response) === Object.prototype) {
+          this.hasContent = false;
+        }
+
         this._productList = response;
         this.loadMaxCounter = Math.ceil(response.length / this.loadAmount);
         result.next(true)

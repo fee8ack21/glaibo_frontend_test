@@ -1,6 +1,6 @@
 <div class="container pt-5">
     <app-tab-navbar [pathPrefix]="'/product'" [pathObjList]="pathObjList"></app-tab-navbar>
-    <div class="products">
+    <section *ngIf="hasContent" class="products">
         <ul #productsList class="products__list">
             <li class="products__item products__item--first-row">
                 <span class="products__cell products__cell--first-row">商品編號</span>
@@ -23,5 +23,10 @@
                 </span>
             </li>
         </ul>
-    </div>
+    </section>
+    <section *ngIf="!hasContent" class="no-content">
+        <h2 class="no-content__text">
+            無訪問內容
+        </h2>
+    </section>
 </div>

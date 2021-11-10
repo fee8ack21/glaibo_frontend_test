@@ -77,3 +77,21 @@
         object-position: center;
     }
 }
+
+.no-content {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: calc(100vh - (3rem + 162px));
+    padding: 30px;
+    margin-bottom: 3rem;
+    border: 1px solid #e3e3e3;
+    border-radius: 15px;
+    box-shadow: 0 3px 0 #62565a29;
+
+    &__text {
+        font-size: 32px;
+        font-weight: $weight-bold;
+        text-align: center;
+    }
+}

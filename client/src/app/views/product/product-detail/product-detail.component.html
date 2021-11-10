@@ -1,5 +1,5 @@
 <div class="container pt-5">
-    <div class="product">
+    <section *ngIf="hasContent" class="product">
         <div class="row">
             <div class="col-12">
                 <div class="back-to-list">
@@ -11,8 +11,10 @@
         </div>
         <div class="row">
             <div class="col-12 col-lg-6 mb-3 mb-lg-0">
-                <div #productImage class="product-image">
-                    <div #productMagnifier class="product-image__magnifier">
+                <div class="product-image">
+                    <div #productImage class="product-image__image">
+                        <div #productMagnifier class="product-image__magnifier">
+                        </div>
                     </div>
                 </div>
             </div>
@@ -36,5 +38,10 @@
                 </div>
             </div>
         </div>
-    </div>
+    </section>
+    <section *ngIf="!hasContent" class="no-content">
+        <h2 class="no-content__text">
+            無訪問內容
+        </h2>
+    </section>
 </div>

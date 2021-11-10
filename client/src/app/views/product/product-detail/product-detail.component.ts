@@ -1,5 +1,6 @@
 import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
+import { Subject } from 'rxjs';
 import { Product } from 'src/app/shared/models/product';
 import { HttpService } from 'src/app/shared/services/http.service';
 import { LoaderService } from 'src/app/shared/services/loader.service';
@@ -13,6 +14,8 @@ export class ProductDetailComponent implements OnInit {
   product: Product = { id: '', name: '', price: 0, type: 0, typeName: '', image1: '', image2: '' };
   productType: number;
   isImgLoaded: false;
+  hasContent: boolean = true;
+
   @ViewChild('productImage') productImage: ElementRef;
   @ViewChild('productMagnifier') productMagnifier: ElementRef;
 
@@ -27,15 +30,25 @@ export class ProductDetailComponent implements OnInit {
     let productID = this.route.snapshot.params['productID'];
     this.productType = this.route.snapshot.params['productType'];
 
-    this.getProduct(productID);
-    this.setMagnifier();
+    this.getProduct(productID).subscribe(result => {
+      this.setMagnifier();
+    }, error => {
+      alert(error);
+    });
   }
 
   getProduct(id: number) {
+    let result = new Subject<boolean>();
     this.loaderService.start();
 
     this.httpService.get<Product>(`products/${id}`).subscribe(
       response => {
+        if (response
+          && Object.keys(response).length === 0
+          && Object.getPrototypeOf(response) === Object.prototype) {
+          this.hasContent = false;
+        }
+
         this.product = response;
 
         this.setProductImage().then(() => {
@@ -44,12 +57,16 @@ export class ProductDetailComponent implements OnInit {
           alert(error);
           this.loaderService.stop();
         })
+
+        result.next(true)
       },
       error => {
-        alert('商品資料載入錯誤')
         this.loaderService.stop();
+        result.error('商品分類載入錯誤')
       }
     );
+
+    return result;
   }
 
   setProductImage() {
