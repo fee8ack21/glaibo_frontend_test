@@ -1,4 +1,4 @@
-import { Component, ElementRef, HostListener, OnInit, ViewChild } from '@angular/core';
+import { Component, ElementRef, HostListener, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Subject } from 'rxjs';
 import { Product, ProductType } from 'src/app/shared/models/product';
@@ -12,7 +12,7 @@ import { LoaderService } from 'src/app/shared/services/loader.service';
   styleUrls: ['./product-list.component.scss']
 })
 
-export class ProductListComponent implements OnInit {
+export class ProductListComponent implements OnInit, OnDestroy {
   childrenPathObjList: TabNavbar[] = [];
 
   _productList: Product[] = [];
@@ -21,6 +21,10 @@ export class ProductListComponent implements OnInit {
   loadCounter = 1;
   loadAmount = 30;
   loadMaxCounter: number;
+
+  getProductsInterval: ReturnType<typeof setInterval>;
+  oldIndexChangedList: number[] = [];
+  newIndexChangedList: number[] = [];
 
   isFirstRouteChange = true;
   @ViewChild('productsList') public productsListEle: ElementRef;
@@ -45,14 +49,22 @@ export class ProductListComponent implements OnInit {
       this.loadCounter = 1;
 
       this.loaderService.start();
-
       this.getProducts(params.productType).subscribe(result => {
         this.showProducts();
+
+        // 路由變化後，重新綁定request interval
+        clearInterval(this.getProductsInterval);
+        this.setGetProductsInterval();
+
         this.loaderService.stop();
       }, error => {
         alert(error);
       })
     })
+  }
+
+  ngOnDestroy() {
+    clearInterval(this.getProductsInterval)
   }
 
   @HostListener('window:scroll', ['$event'])
@@ -78,17 +90,17 @@ export class ProductListComponent implements OnInit {
       if (param != undefined) {
         this.getProducts(param).subscribe(result => {
           this.showProducts();
+
+          // 執行第一次getProducts後，綁定request interval
+          clearInterval(this.getProductsInterval);
+          this.setGetProductsInterval();
+
           this.loaderService.stop();
         }, error => {
           alert(error)
         });
       } else {
-        this.getProducts(parseInt(this.childrenPathObjList[0].path)).subscribe(result => {
-          this.showProducts();
-          this.loaderService.stop();
-        }, error => {
-          alert(error);
-        });
+        this.router.navigate(['/product', this.childrenPathObjList[0].path]);
       }
     }, error => {
       alert(error)
@@ -134,5 +146,74 @@ export class ProductListComponent implements OnInit {
 
     this.productList = this.productList.concat(this._productList.slice((this.loadCounter - 1) * this.loadAmount, (this.loadCounter * this.loadAmount)))
     this.loadCounter++;
+  }
+
+  setGetProductsInterval() {
+    const param = this.route.snapshot.params['productType'];
+
+    // 模擬請求，儘管response 一樣
+    this.getProductsInterval = setInterval(() => {
+      let result = new Subject<boolean>();
+      this.httpService.get<Product[]>(`products?type=${param}`).subscribe(
+        response => {
+          // 取得要替換資料的index
+          this.oldIndexChangedList = this.newIndexChangedList;
+          this.newIndexChangedList = [];
+          let priceColumns = this.elements.nativeElement.querySelectorAll('.js-price-cell');
+
+          while (this.newIndexChangedList.length < 50) {
+            let randomIndex = this.getRandomInt(0, response.length);
+            let isUnique = true;
+            for (let j = 0; j < this.newIndexChangedList.length; j++) {
+              if (randomIndex == this.newIndexChangedList[j]) {
+                isUnique = false;
+                break;
+              }
+            }
+
+            if (isUnique) {
+              this.newIndexChangedList.push(randomIndex);
+            }
+          }
+
+          // 如為正式狀況，則另外取出兩個陣列不同value 的index位置
+
+          // 替換資料，商品價格+1
+          for (let i = 0; i < this.newIndexChangedList.length; i++) {
+            this._productList[this.newIndexChangedList[i]].price++;
+
+            if (this.newIndexChangedList[i] > this.productList.length) { continue }
+            if (this.productList[this.newIndexChangedList[i]] == undefined) { continue }
+            this.productList[this.newIndexChangedList[i]].price++;
+          }
+
+          // 還原上一輪樣式變動的欄位
+          for (let i = 0; i < this.oldIndexChangedList.length; i++) {
+            if (this.oldIndexChangedList[i] > priceColumns.length) { continue };
+            if (priceColumns[this.oldIndexChangedList[i]] == undefined) { continue }
+
+            priceColumns[this.oldIndexChangedList[i]].style['color'] = 'black';
+          }
+          
+          // 針對這一輪資料變動的欄位更改樣式
+          for (let i = 0; i < this.newIndexChangedList.length; i++) {
+            if (this.newIndexChangedList[i] > priceColumns.length) { continue };
+            if (priceColumns[this.newIndexChangedList[i]] == undefined) { continue }
+
+            priceColumns[this.newIndexChangedList[i]].style['color'] = 'red';
+          }
+        },
+        error => {
+          result.error('商品列表載入錯誤')
+        }
+      );
+      return result;
+    }, 5000)
+  }
+
+  getRandomInt(min: number, max: number) {
+    min = Math.ceil(min);
+    max = Math.floor(max);
+    return Math.floor(Math.random() * (max - min) + min);
   }
 }
