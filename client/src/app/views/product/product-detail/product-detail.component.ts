@@ -1,5 +1,5 @@
 import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute } from '@angular/router';
 import { Product } from 'src/app/shared/models/product';
 import { HttpService } from 'src/app/shared/services/http.service';
 import { LoaderService } from 'src/app/shared/services/loader.service';
@@ -18,7 +18,6 @@ export class ProductDetailComponent implements OnInit {
 
   constructor(
     private route: ActivatedRoute,
-    private router: Router,
     private httpService: HttpService,
     private loaderService: LoaderService,
     private elements: ElementRef
@@ -75,6 +74,10 @@ export class ProductDetailComponent implements OnInit {
   }
 
   setMagnifier() {
+    if ((/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent))) {
+      return;
+    }
+
     var productImage = this.elements.nativeElement.querySelector('.product-image');
     var magnifier = this.elements.nativeElement.querySelector('.product-image__magnifier');
 

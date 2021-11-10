@@ -1,4 +1,5 @@
 import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
+import { TabNavbar } from 'src/app/shared/models/tab-navbar';
 
 @Component({
   selector: 'app-tab-navbar-modal',
@@ -8,7 +9,7 @@ import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
 export class TabNavbarModalComponent implements OnInit {
 
   @Input() public pathPrefix: string;
-  @Input() public pathObjList: any;
+  @Input() public pathObjList: TabNavbar[];
   @Input() public isModalOpen: boolean;
   @Output() public modalClose = new EventEmitter<boolean>();
 

@@ -1,5 +1,6 @@
 import { Component, OnInit, Input, HostListener, OnChanges } from '@angular/core';
 import { Router } from '@angular/router';
+import { TabNavbar } from '../../models/tab-navbar';
 
 @Component({
   selector: 'app-tab-navbar',
@@ -14,8 +15,8 @@ export class TabNavbarComponent implements OnChanges, OnInit {
   @Input()
   public pathPrefix!: string;
 
-  @Input('childrenPathObjList')
-  public pathObjList: any;
+  @Input('pathObjList')
+  public pathObjList: TabNavbar[];
 
   constructor(
     private router: Router,

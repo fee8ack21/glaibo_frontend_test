@@ -13,7 +13,7 @@ import { LoaderService } from 'src/app/shared/services/loader.service';
 })
 
 export class ProductListComponent implements OnInit, OnDestroy {
-  childrenPathObjList: TabNavbar[] = [];
+  pathObjList: TabNavbar[] = [];
 
   _productList: Product[] = [];
   productList: Product[] = [];
@@ -98,7 +98,7 @@ export class ProductListComponent implements OnInit, OnDestroy {
           alert(error)
         });
       } else {
-        this.router.navigate(['/product', this.childrenPathObjList[0].path]);
+        this.router.navigate(['/product', this.pathObjList[0].path]);
       }
     }, error => {
       alert(error)
@@ -109,12 +109,12 @@ export class ProductListComponent implements OnInit, OnDestroy {
     let result = new Subject<boolean>();
     this.httpService.get<ProductType[]>('productTypes').subscribe(
       response => {
-        let _childrenPathObjList: TabNavbar[] = [];
+        let _pathObjList: TabNavbar[] = [];
 
         response.forEach((item: any) => {
-          _childrenPathObjList.push({ path: item.id.toString(), name: item.name })
+          _pathObjList.push({ path: item.id.toString(), name: item.name })
         })
-        this.childrenPathObjList = _childrenPathObjList;
+        this.pathObjList = _pathObjList;
         result.next(true)
       },
       error => {
@@ -154,11 +154,12 @@ export class ProductListComponent implements OnInit, OnDestroy {
       let result = new Subject<boolean>();
       this.httpService.get<Product[]>(`products?type=${param}`).subscribe(
         response => {
-          // 取得要替換資料的index
+          // 更新新舊陣列內容
           this.oldIndexChangedList = this.newIndexChangedList;
           this.newIndexChangedList = [];
           let priceColumns = this.elements.nativeElement.querySelectorAll('.js-price-cell');
 
+          // 取得要替換資料的index
           while (this.newIndexChangedList.length < 50) {
             let randomIndex = this.getRandomInt(0, response.length);
             let isUnique = true;
@@ -180,23 +181,24 @@ export class ProductListComponent implements OnInit, OnDestroy {
           for (let i = 0; i < this.newIndexChangedList.length; i++) {
             this._productList[this.newIndexChangedList[i]].price++;
 
-            if (this.newIndexChangedList[i] > this.productList.length) { continue }
-            if (this.productList[this.newIndexChangedList[i]] == undefined) { continue }
+            if (this.newIndexChangedList[i] > this.productList.length ||
+              this.productList[this.newIndexChangedList[i]] == undefined) { continue }
+
             this.productList[this.newIndexChangedList[i]].price++;
           }
 
           // 還原上一輪樣式變動的欄位
           for (let i = 0; i < this.oldIndexChangedList.length; i++) {
-            if (this.oldIndexChangedList[i] > priceColumns.length) { continue };
-            if (priceColumns[this.oldIndexChangedList[i]] == undefined) { continue }
+            if (this.oldIndexChangedList[i] > priceColumns.length ||
+              priceColumns[this.oldIndexChangedList[i]] == undefined) { continue };
 
             priceColumns[this.oldIndexChangedList[i]].style['color'] = 'black';
           }
 
           // 針對這一輪資料變動的欄位更改樣式
           for (let i = 0; i < this.newIndexChangedList.length; i++) {
-            if (this.newIndexChangedList[i] > priceColumns.length) { continue };
-            if (priceColumns[this.newIndexChangedList[i]] == undefined) { continue }
+            if (this.newIndexChangedList[i] > priceColumns.length ||
+              priceColumns[this.newIndexChangedList[i]] == undefined) { continue };
 
             priceColumns[this.newIndexChangedList[i]].style['color'] = 'red';
           }
